@@ -100,7 +100,30 @@ class App:
  def label(self,parent,value,size=11,color="#f0f8ff"):
   return tk.Label(parent,text=value,bg=parent["bg"],fg=color,font=("Segoe UI",size,"bold"))
  def btn(self,parent,name,command):
-  return tk.Button(parent,text=name,command=command,bg=CYAN if name in ("OK","Vincular","Confirmar") else PANEL,fg=BG if name in ("OK","Vincular","Confirmar") else "#f0f8ff",relief="solid",bd=2,highlightthickness=1,highlightbackground=PINK,highlightcolor=CYAN,activebackground=CYAN,activeforeground=BG,width=12,pady=7,font=("Segoe UI",10,"bold"))
+  width=126;height=38;radius=12
+  canvas=tk.Canvas(parent,width=width,height=height,bg=parent["bg"],highlightthickness=0,bd=0,cursor="hand2")
+  special=name in ("OK","Vincular","Confirmar")
+  def paint(hover=False):
+   canvas.delete("all")
+   fill=CYAN if special or hover else PANEL
+   outline=PINK if not hover else CYAN
+   r=radius;w=width;h=height
+   # Esquinas redondeadas reales con contorno y fondo
+   for x,y in ((r,r),(w-r,r),(r,h-r),(w-r,h-r)):
+    canvas.create_oval(x-r,y-r,x+r,y+r,fill=outline,outline=outline)
+   canvas.create_rectangle(r,0,w-r,h,fill=outline,outline=outline)
+   canvas.create_rectangle(0,r,w,h-r,fill=outline,outline=outline)
+   inset=2;ri=r-inset
+   for x,y in ((r,r),(w-r,r),(r,h-r),(w-r,h-r)):
+    canvas.create_oval(x-ri,y-ri,x+ri,y+ri,fill=fill,outline=fill)
+   canvas.create_rectangle(r,inset,w-r,h-inset,fill=fill,outline=fill)
+   canvas.create_rectangle(inset,r,w-inset,h-r,fill=fill,outline=fill)
+   canvas.create_text(w/2,h/2,text=name,fill=BG if special or hover else "#f0f8ff",font=("Segoe UI",10,"bold"))
+  paint()
+  canvas.bind("<Enter>",lambda e:paint(True))
+  canvas.bind("<Leave>",lambda e:paint(False))
+  canvas.bind("<Button-1>",lambda e:command())
+  return canvas
  def host(self):
   try:
    ip=str(ipaddress.ip_address(self.ip.get().strip()));(ROOT/"settings.json").write_text(json.dumps({"ip":ip}));return ip
