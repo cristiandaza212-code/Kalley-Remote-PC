@@ -44,23 +44,14 @@ class Remote:
   self.notify("Teclas enviadas; comprueba el texto en la TV")
 class App:
  def __init__(self):
-  self.root=tk.Tk();self.root.title("Kalley Remote PC - RGB");self.root.geometry("440x800");self.root.configure(bg=BG)
+  self.root=tk.Tk();self.root.title("Kalley Remote PC - RGB");self.root.geometry("440x680");self.root.configure(bg=BG)
   self.events=queue.Queue();self.remote=Remote(self.events.put)
   try:saved=json.loads((ROOT/"settings.json").read_text())
   except Exception:saved={}
   self.ip=tk.StringVar(value=saved.get("ip",""));self.code=tk.StringVar();self.status=tk.StringVar(value="Sin conexión")
   self.label(self.root,"KALLEY REMOTE PC",22,CYAN).pack(pady=(20,0))
   self.label(self.root,"GOOGLE TV  /  RGB EDITION",10,PINK).pack(pady=(0,14))
-  panel=tk.Frame(self.root,bg=PANEL,padx=12,pady=12);panel.pack(fill="x",padx=20)
-  self.label(panel,"IP de Google TV",11).pack(anchor="w")
-  tk.Entry(panel,textvariable=self.ip,font=("Segoe UI",13)).pack(fill="x",pady=5)
-  r=tk.Frame(panel,bg=PANEL);r.pack()
-  self.btn(r,"Vincular",self.pair).pack(side="left",padx=5)
-  self.btn(r,"Conectar",self.connect).pack(side="left",padx=5)
-  self.label(panel,"Código de 6 caracteres (letras y números)",11).pack(anchor="w",pady=(10,0))
-  r=tk.Frame(panel,bg=PANEL);r.pack()
-  tk.Entry(r,textvariable=self.code,width=16,font=("Segoe UI",13)).pack(side="left")
-  self.btn(r,"Confirmar",self.confirm).pack(side="left",padx=5)
+  self.btn(self.root,"Configurar TV",self.show_settings).pack(pady=(0,12))
   self.label(self.root,"ESTADO",10,PINK).pack(pady=(12,0))
   tk.Label(self.root,textvariable=self.status,bg=BG,fg=CYAN,wraplength=390).pack(pady=(0,12))
   grid=tk.Frame(self.root,bg=BG);grid.pack()
@@ -76,6 +67,23 @@ class App:
   self.btn(typing,"Enviar texto",self.send_text).pack(side="left",padx=5)
   self.label(self.root,"Flechas / Enter / Esc / Home / + y -",9).pack(pady=12)
   self.root.bind("<KeyPress>",self.keyboard);self.root.after(100,self.poll)
+ def show_settings(self):
+  if hasattr(self,"settings_window") and self.settings_window.winfo_exists():
+   self.settings_window.lift();self.settings_window.focus_force();return
+  win=tk.Toplevel(self.root);self.settings_window=win
+  win.title("Configurar Google TV");win.geometry("430x310");win.configure(bg=BG);win.resizable(False,False)
+  self.label(win,"CONFIGURAR GOOGLE TV",17,CYAN).pack(pady=(15,10))
+  panel=tk.Frame(win,bg=PANEL,padx=12,pady=12);panel.pack(fill="x",padx=15)
+  self.label(panel,"IP de Google TV",11).pack(anchor="w")
+  tk.Entry(panel,textvariable=self.ip,font=("Segoe UI",13)).pack(fill="x",pady=5)
+  r=tk.Frame(panel,bg=PANEL);r.pack()
+  self.btn(r,"Vincular",self.pair).pack(side="left",padx=5)
+  self.btn(r,"Conectar",self.connect).pack(side="left",padx=5)
+  self.label(panel,"Código (6 letras o números)",11).pack(anchor="w",pady=(10,0))
+  r=tk.Frame(panel,bg=PANEL);r.pack()
+  tk.Entry(r,textvariable=self.code,width=16,font=("Segoe UI",13)).pack(side="left")
+  self.btn(r,"Confirmar",self.confirm).pack(side="left",padx=5)
+  self.label(win,"El estado de conexión aparece en la ventana principal",9).pack(pady=12)
  def label(self,parent,value,size=11,color="#f0f8ff"):
   return tk.Label(parent,text=value,bg=parent["bg"],fg=color,font=("Segoe UI",size,"bold"))
  def btn(self,parent,name,command):
