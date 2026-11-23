@@ -100,7 +100,7 @@ class App:
  def label(self,parent,value,size=11,color="#f0f8ff"):
   return tk.Label(parent,text=value,bg=parent["bg"],fg=color,font=("Segoe UI",size,"bold"))
  def btn(self,parent,name,command):
-  return tk.Button(parent,text=name,command=command,bg=CYAN if name in ("OK","Vincular","Confirmar") else PANEL,fg=BG if name in ("OK","Vincular","Confirmar") else "#f0f8ff",relief="flat",width=12,pady=7,font=("Segoe UI",10,"bold"))
+  return tk.Button(parent,text=name,command=command,bg=CYAN if name in ("OK","Vincular","Confirmar") else PANEL,fg=BG if name in ("OK","Vincular","Confirmar") else "#f0f8ff",relief="solid",bd=2,highlightthickness=1,highlightbackground=PINK,highlightcolor=CYAN,activebackground=CYAN,activeforeground=BG,width=12,pady=7,font=("Segoe UI",10,"bold"))
  def host(self):
   try:
    ip=str(ipaddress.ip_address(self.ip.get().strip()));(ROOT/"settings.json").write_text(json.dumps({"ip":ip}));return ip
