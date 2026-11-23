@@ -19,7 +19,7 @@ jobs:
         shell: pwsh
         run: |
           $icon = @()
-          if (Test-Path "kalley.ico") { $icon = @("--icon", "kalley.ico") }
+          if (Test-Path "kalley.ico") { $icon = @("--icon", "kalley.ico", "--add-data", "kalley.ico;.") }
           python -m PyInstaller --noconfirm --clean --onefile --windowed --name KalleyRemotePC --collect-all androidtvremote2 @icon app.py
       - uses: actions/upload-artifact@v4
         with:
