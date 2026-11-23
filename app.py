@@ -107,7 +107,9 @@ class App:
  def label(self,parent,value,size=11,color="#f0f8ff"):
   return tk.Label(parent,text=value,bg=parent["bg"],fg=color,font=("Segoe UI",size,"bold"))
  def btn(self,parent,name,command):
-  width=126;height=38;radius=12
+  icons={"Encender":"⏻","Inicio":"⌂","Atrás":"↩","Arriba":"▲","Abajo":"▼","Izquierda":"◀","Derecha":"▶","OK":"●","Vol +":"🔊 +","Vol -":"🔉 −","Silencio":"🔇","Play/Pausa":"⏯","Entradas":"▣","Configurar TV":"⚙","Teclado TV":"⌨"}
+  shown=icons.get(name,name)
+  width=64 if name in KEYS else 126;height=38;radius=12
   canvas=tk.Canvas(parent,width=width,height=height,bg=parent["bg"],highlightthickness=0,bd=0,cursor="hand2")
   special=name in ("OK","Vincular","Confirmar")
   def paint(hover=False):
@@ -125,7 +127,7 @@ class App:
     canvas.create_oval(x-ri,y-ri,x+ri,y+ri,fill=fill,outline=fill)
    canvas.create_rectangle(r,inset,w-r,h-inset,fill=fill,outline=fill)
    canvas.create_rectangle(inset,r,w-inset,h-r,fill=fill,outline=fill)
-   canvas.create_text(w/2,h/2,text=name,fill=BG if special or hover else "#f0f8ff",font=("Segoe UI",10,"bold"))
+   canvas.create_text(w/2,h/2,text=shown,fill=BG if special or hover else "#f0f8ff",font=("Segoe UI Symbol",15 if name in KEYS else 10,"bold"))
   paint()
   canvas.bind("<Enter>",lambda e:paint(True))
   canvas.bind("<Leave>",lambda e:paint(False))
