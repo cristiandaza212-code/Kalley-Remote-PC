@@ -30,9 +30,21 @@ class Remote:
  async def key(self,name):
   if not self.ready:self.notify("Primero conecta la TV");return
   self.tv.send_key_command(KEYS[name])
+ async def type_text(self,text):
+  if not self.ready:self.notify("Primero conecta la TV");return
+  for ch in text:
+   if ch.isascii() and ch.isalpha():key="KEYCODE_"+ch.upper()
+   elif ch.isascii() and ch.isdigit():key="KEYCODE_"+ch
+   elif ch==" ":key="KEYCODE_SPACE"
+   elif ch=="\\b":key="KEYCODE_DEL"
+   else:
+    self.notify("Caracter no compatible: "+ch);continue
+   self.tv.send_key_command(key)
+   await asyncio.sleep(0.06)
+  self.notify("Teclas enviadas; comprueba el texto en la TV")
 class App:
  def __init__(self):
-  self.root=tk.Tk();self.root.title("Kalley Remote PC - RGB");self.root.geometry("440x690");self.root.configure(bg=BG)
+  self.root=tk.Tk();self.root.title("Kalley Remote PC - RGB");self.root.geometry("440x800");self.root.configure(bg=BG)
   self.events=queue.Queue();self.remote=Remote(self.events.put)
   try:saved=json.loads((ROOT/"settings.json").read_text())
   except Exception:saved={}
@@ -56,7 +68,13 @@ class App:
   for i,row in enumerate(rows):
    for j,name in enumerate(row):
     if name:self.btn(grid,name,lambda n=name:self.remote.run(self.remote.key(n))).grid(row=i,column=j,padx=4,pady=4)
-  self.label(self.root,"Flechas / Enter / Esc / F10-F11",9).pack(pady=12)
+  self.label(self.root,"Escribir en Google TV",11,CYAN).pack(pady=(12,3))
+  typing=tk.Frame(self.root,bg=BG);typing.pack(padx=20,fill="x")
+  self.text_to_send=tk.StringVar()
+  self.text_entry=tk.Entry(typing,textvariable=self.text_to_send,font=("Segoe UI",12))
+  self.text_entry.pack(side="left",fill="x",expand=True)
+  self.btn(typing,"Enviar texto",self.send_text).pack(side="left",padx=5)
+  self.label(self.root,"Flechas / Enter / Esc / Home / F10-F11",9).pack(pady=12)
   self.root.bind("<KeyPress>",self.keyboard);self.root.after(100,self.poll)
  def label(self,parent,value,size=11,color="#f0f8ff"):
   return tk.Label(parent,text=value,bg=parent["bg"],fg=color,font=("Segoe UI",size,"bold"))
@@ -76,10 +94,16 @@ class App:
   c=self.code.get().strip().upper()
   if len(c)!=6 or not c.isalnum():messagebox.showerror("Código","Introduce los 6 caracteres (letras y números)");return
   self.remote.run(self.remote.finish(c))
+ def send_text(self):
+  text=self.text_to_send.get()
+  if text:self.remote.run(self.remote.type_text(text))
+  self.root.focus_set()
  def keyboard(self,event):
   if isinstance(event.widget,tk.Entry):return
   mapping={"Up":"Arriba","Down":"Abajo","Left":"Izquierda","Right":"Derecha","Return":"OK","Escape":"Atrás","Home":"Inicio","F10":"Vol -","F11":"Vol +"}
   if event.keysym in mapping:self.remote.run(self.remote.key(mapping[event.keysym]))
+  elif event.keysym=="BackSpace":self.remote.run(self.remote.type_text("\\b"))
+  elif event.char and event.char.isascii() and (event.char.isalnum() or event.char==" "):self.remote.run(self.remote.type_text(event.char))
  def poll(self):
   while not self.events.empty():self.status.set(self.events.get_nowait())
   self.root.after(100,self.poll)
