@@ -45,7 +45,7 @@ class App:
   r=tk.Frame(panel,bg=PANEL);r.pack()
   self.btn(r,"Vincular",self.pair).pack(side="left",padx=5)
   self.btn(r,"Conectar",self.connect).pack(side="left",padx=5)
-  self.label(panel,"Código de 6 dígitos",11).pack(anchor="w",pady=(10,0))
+  self.label(panel,"Código de 6 caracteres (letras y números)",11).pack(anchor="w",pady=(10,0))
   r=tk.Frame(panel,bg=PANEL);r.pack()
   tk.Entry(r,textvariable=self.code,width=16,font=("Segoe UI",13)).pack(side="left")
   self.btn(r,"Confirmar",self.confirm).pack(side="left",padx=5)
@@ -73,8 +73,8 @@ class App:
   h=self.host()
   if h:self.remote.run(self.remote.connect(h))
  def confirm(self):
-  c=self.code.get().strip()
-  if len(c)!=6 or not c.isdigit():messagebox.showerror("Código","Introduce los 6 dígitos");return
+  c=self.code.get().strip().upper()
+  if len(c)!=6 or not c.isalnum():messagebox.showerror("Código","Introduce los 6 caracteres (letras y números)");return
   self.remote.run(self.remote.finish(c))
  def keyboard(self,event):
   if isinstance(event.widget,tk.Entry):return
