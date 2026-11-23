@@ -63,6 +63,9 @@ class App:
   self.text_to_send=tk.StringVar()
   self.label(self.root,"Flechas / Enter / Esc / Home / + y -",9).pack(pady=12)
   self.root.bind("<KeyPress>",self.keyboard);self.root.after(100,self.poll)
+  if self.ip.get().strip():
+   self.status.set("Conectando automáticamente...")
+   self.root.after(350,self.auto_connect)
  def show_keyboard(self):
   if hasattr(self,"keyboard_window") and self.keyboard_window.winfo_exists():
    self.keyboard_window.lift();self.keyboard_window.focus_force();return
@@ -74,6 +77,10 @@ class App:
   self.btn(win,"Enviar texto",self.send_text).pack(pady=7)
   self.text_entry.bind("<Return>",lambda event:self.send_text())
   self.text_entry.focus_set()
+ def auto_connect(self):
+  try:host=str(ipaddress.ip_address(self.ip.get().strip()))
+  except ValueError:self.status.set("IP guardada inválida: usa Configurar TV");return
+  self.remote.run(self.remote.connect(host))
  def set_window_icon(self,window):
   base=Path(getattr(sys,"_MEIPASS",Path(__file__).resolve().parent))
   icon=base/"kalley.ico"
