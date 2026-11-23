@@ -59,14 +59,21 @@ class App:
   for i,row in enumerate(rows):
    for j,name in enumerate(row):
     if name:self.btn(grid,name,lambda n=name:self.remote.run(self.remote.key(n))).grid(row=i,column=j,padx=4,pady=4)
-  self.label(self.root,"Escribir en Google TV",11,CYAN).pack(pady=(12,3))
-  typing=tk.Frame(self.root,bg=BG);typing.pack(padx=20,fill="x")
+  self.btn(self.root,"Teclado TV",self.show_keyboard).pack(pady=(12,3))
   self.text_to_send=tk.StringVar()
-  self.text_entry=tk.Entry(typing,textvariable=self.text_to_send,font=("Segoe UI",12))
-  self.text_entry.pack(side="left",fill="x",expand=True)
-  self.btn(typing,"Enviar texto",self.send_text).pack(side="left",padx=5)
   self.label(self.root,"Flechas / Enter / Esc / Home / + y -",9).pack(pady=12)
   self.root.bind("<KeyPress>",self.keyboard);self.root.after(100,self.poll)
+ def show_keyboard(self):
+  if hasattr(self,"keyboard_window") and self.keyboard_window.winfo_exists():
+   self.keyboard_window.lift();self.keyboard_window.focus_force();return
+  win=tk.Toplevel(self.root);self.set_window_icon(win);self.keyboard_window=win
+  win.title("Teclado de Google TV");win.geometry("440x190");win.configure(bg=BG);win.resizable(False,False)
+  self.label(win,"ESCRIBIR EN GOOGLE TV",16,CYAN).pack(pady=(15,8))
+  self.text_entry=tk.Entry(win,textvariable=self.text_to_send,font=("Segoe UI",13))
+  self.text_entry.pack(fill="x",padx=18,pady=5)
+  self.btn(win,"Enviar texto",self.send_text).pack(pady=7)
+  self.text_entry.bind("<Return>",lambda event:self.send_text())
+  self.text_entry.focus_set()
  def set_window_icon(self,window):
   base=Path(getattr(sys,"_MEIPASS",Path(__file__).resolve().parent))
   icon=base/"kalley.ico"
@@ -111,7 +118,7 @@ class App:
  def send_text(self):
   text=self.text_to_send.get()
   if text:self.remote.run(self.remote.type_text(text))
-  self.root.focus_set()
+  if hasattr(self,"text_entry") and self.text_entry.winfo_exists():self.text_entry.focus_set()
  def keyboard(self,event):
   if isinstance(event.widget,tk.Entry):return
   mapping={"Up":"Arriba","Down":"Abajo","Left":"Izquierda","Right":"Derecha","Return":"OK","Escape":"Atrás","Home":"Inicio","F10":"Vol -","F11":"Vol +","plus":"Vol +","KP_Add":"Vol +","minus":"Vol -","KP_Subtract":"Vol -"}
