@@ -1,4 +1,4 @@
-import asyncio, ipaddress, json, os, queue, threading, tkinter as tk
+import asyncio, ipaddress, json, os, queue, threading, sys, tkinter as tk
 from pathlib import Path
 from tkinter import messagebox
 from androidtvremote2 import AndroidTVRemote
@@ -44,7 +44,7 @@ class Remote:
   self.notify("Teclas enviadas; comprueba el texto en la TV")
 class App:
  def __init__(self):
-  self.root=tk.Tk();self.root.title("Kalley Remote PC - RGB");self.root.geometry("440x680");self.root.configure(bg=BG)
+  self.root=tk.Tk();self.set_window_icon(self.root);self.root.title("Kalley Remote PC - RGB");self.root.geometry("440x680");self.root.configure(bg=BG)
   self.events=queue.Queue();self.remote=Remote(self.events.put)
   try:saved=json.loads((ROOT/"settings.json").read_text())
   except Exception:saved={}
@@ -67,10 +67,16 @@ class App:
   self.btn(typing,"Enviar texto",self.send_text).pack(side="left",padx=5)
   self.label(self.root,"Flechas / Enter / Esc / Home / + y -",9).pack(pady=12)
   self.root.bind("<KeyPress>",self.keyboard);self.root.after(100,self.poll)
+ def set_window_icon(self,window):
+  base=Path(getattr(sys,"_MEIPASS",Path(__file__).resolve().parent))
+  icon=base/"kalley.ico"
+  if icon.is_file():
+   try:window.iconbitmap(str(icon))
+   except tk.TclError:pass
  def show_settings(self):
   if hasattr(self,"settings_window") and self.settings_window.winfo_exists():
    self.settings_window.lift();self.settings_window.focus_force();return
-  win=tk.Toplevel(self.root);self.settings_window=win
+  win=tk.Toplevel(self.root);self.set_window_icon(win);self.settings_window=win
   win.title("Configurar Google TV");win.geometry("430x310");win.configure(bg=BG);win.resizable(False,False)
   self.label(win,"CONFIGURAR GOOGLE TV",17,CYAN).pack(pady=(15,10))
   panel=tk.Frame(win,bg=PANEL,padx=12,pady=12);panel.pack(fill="x",padx=15)
