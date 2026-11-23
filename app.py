@@ -74,7 +74,7 @@ class App:
   self.text_entry=tk.Entry(typing,textvariable=self.text_to_send,font=("Segoe UI",12))
   self.text_entry.pack(side="left",fill="x",expand=True)
   self.btn(typing,"Enviar texto",self.send_text).pack(side="left",padx=5)
-  self.label(self.root,"Flechas / Enter / Esc / Home / F10-F11",9).pack(pady=12)
+  self.label(self.root,"Flechas / Enter / Esc / Home / + y -",9).pack(pady=12)
   self.root.bind("<KeyPress>",self.keyboard);self.root.after(100,self.poll)
  def label(self,parent,value,size=11,color="#f0f8ff"):
   return tk.Label(parent,text=value,bg=parent["bg"],fg=color,font=("Segoe UI",size,"bold"))
@@ -100,8 +100,9 @@ class App:
   self.root.focus_set()
  def keyboard(self,event):
   if isinstance(event.widget,tk.Entry):return
-  mapping={"Up":"Arriba","Down":"Abajo","Left":"Izquierda","Right":"Derecha","Return":"OK","Escape":"Atrás","Home":"Inicio","F10":"Vol -","F11":"Vol +"}
+  mapping={"Up":"Arriba","Down":"Abajo","Left":"Izquierda","Right":"Derecha","Return":"OK","Escape":"Atrás","Home":"Inicio","F10":"Vol -","F11":"Vol +","plus":"Vol +","KP_Add":"Vol +","minus":"Vol -","KP_Subtract":"Vol -"}
   if event.keysym in mapping:self.remote.run(self.remote.key(mapping[event.keysym]))
+  elif event.char=="+":self.remote.run(self.remote.key("Vol +"))
   elif event.keysym=="BackSpace":self.remote.run(self.remote.type_text("\\b"))
   elif event.char and event.char.isascii() and (event.char.isalnum() or event.char==" "):self.remote.run(self.remote.type_text(event.char))
  def poll(self):
