@@ -18,9 +18,8 @@ jobs:
       - name: Compilar EXE portable con icono
         shell: pwsh
         run: |
-          $icon = @()
-          if (Test-Path "kalley.ico") { $icon = @("--icon", "kalley.ico", "--add-data", "kalley.ico;.") }
-          python -m PyInstaller --noconfirm --clean --onefile --windowed --name KalleyRemotePC --collect-all androidtvremote2 @icon app.py
+          if (-not (Test-Path "kalley.ico")) { throw "Falta kalley.ico: se cancela la compilacion para evitar perder el icono" }
+          python -m PyInstaller --noconfirm --clean --onefile --windowed --name KalleyRemotePC --icon kalley.ico --add-data "kalley.ico;." --collect-all androidtvremote2 app.py
       - uses: actions/upload-artifact@v4
         with:
           name: KalleyRemotePC-Windows
