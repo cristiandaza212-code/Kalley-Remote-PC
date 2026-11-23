@@ -5,7 +5,7 @@ from androidtvremote2 import AndroidTVRemote
 
 ROOT=Path(os.getenv("LOCALAPPDATA",str(Path.home())))/"KalleyRemotePC"
 ROOT.mkdir(parents=True,exist_ok=True)
-BG="#0b1020"; PANEL="#19243b"; CYAN="#36e5ff"; PINK="#ff4ed2"
+BG="#0b0c0b"; PANEL="#252825"; CYAN="#aeb5ae"; PINK="#245c38"
 KEYS={"Arriba":"KEYCODE_DPAD_UP","Abajo":"KEYCODE_DPAD_DOWN","Izquierda":"KEYCODE_DPAD_LEFT","Derecha":"KEYCODE_DPAD_RIGHT","OK":"KEYCODE_DPAD_CENTER","Inicio":"KEYCODE_HOME","Atrás":"KEYCODE_BACK","Vol +":"KEYCODE_VOLUME_UP","Vol -":"KEYCODE_VOLUME_DOWN","Silencio":"KEYCODE_VOLUME_MUTE","Encender":"KEYCODE_POWER","Play/Pausa":"KEYCODE_MEDIA_PLAY_PAUSE","Entradas":"KEYCODE_TV_INPUT"}
 class Remote:
  def __init__(self,notify):
@@ -44,13 +44,13 @@ class Remote:
   self.notify("Teclas enviadas; comprueba el texto en la TV")
 class App:
  def __init__(self):
-  self.root=tk.Tk();self.set_window_icon(self.root);self.root.title("Kalley Remote PC - RGB");self.root.geometry("440x680");self.root.configure(bg=BG)
+  self.root=tk.Tk();self.set_window_icon(self.root);self.root.title("Kalley Remote PC");self.root.geometry("440x680");self.root.configure(bg=BG)
   self.events=queue.Queue();self.remote=Remote(self.events.put)
   try:saved=json.loads((ROOT/"settings.json").read_text())
   except Exception:saved={}
   self.ip=tk.StringVar(value=saved.get("ip",""));self.code=tk.StringVar();self.status=tk.StringVar(value="Sin conexión")
   self.label(self.root,"KALLEY REMOTE PC",22,CYAN).pack(pady=(20,0))
-  self.label(self.root,"GOOGLE TV  /  RGB EDITION",10,PINK).pack(pady=(0,14))
+  self.label(self.root,"GOOGLE TV  /  DARK EDITION",10,PINK).pack(pady=(0,14))
   self.btn(self.root,"Configurar TV",self.show_settings).pack(pady=(0,12))
   self.label(self.root,"ESTADO",10,PINK).pack(pady=(12,0))
   tk.Label(self.root,textvariable=self.status,bg=BG,fg=CYAN,wraplength=390).pack(pady=(0,12))
@@ -114,8 +114,8 @@ class App:
   special=name in ("OK","Vincular","Confirmar")
   def paint(hover=False):
    canvas.delete("all")
-   fill=CYAN if special or hover else PANEL
-   outline=PINK if not hover else CYAN
+   fill="#344c39" if special or hover else PANEL
+   outline=PINK if not hover else "#398b53"
    r=radius;w=width;h=height
    # Esquinas redondeadas reales con contorno y fondo
    for x,y in ((r,r),(w-r,r),(r,h-r),(w-r,h-r)):
@@ -127,7 +127,7 @@ class App:
     canvas.create_oval(x-ri,y-ri,x+ri,y+ri,fill=fill,outline=fill)
    canvas.create_rectangle(r,inset,w-r,h-inset,fill=fill,outline=fill)
    canvas.create_rectangle(inset,r,w-inset,h-r,fill=fill,outline=fill)
-   canvas.create_text(w/2,h/2,text=shown,fill=BG if special or hover else "#f0f8ff",font=("Segoe UI Symbol",15 if name in KEYS else 10,"bold"))
+   canvas.create_text(w/2,h/2,text=shown,fill="#f0f2f0",font=("Segoe UI Symbol",15 if name in KEYS else 10,"bold"))
   paint()
   canvas.bind("<Enter>",lambda e:paint(True))
   canvas.bind("<Leave>",lambda e:paint(False))
