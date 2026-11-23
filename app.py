@@ -3,6 +3,14 @@ from pathlib import Path
 from tkinter import messagebox
 from androidtvremote2 import AndroidTVRemote
 
+# Identidad de la aplicacion para el icono en la barra de tareas de Windows.
+if sys.platform == "win32":
+ try:
+  import ctypes
+  ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("Kalley.RemotePC.Desktop")
+ except (AttributeError, OSError):
+  pass
+
 ROOT=Path(os.getenv("LOCALAPPDATA",str(Path.home())))/"KalleyRemotePC"
 ROOT.mkdir(parents=True,exist_ok=True)
 BG="#0b0c0b"; PANEL="#252825"; CYAN="#aeb5ae"; PINK="#245c38"
