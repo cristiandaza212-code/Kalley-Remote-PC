@@ -57,8 +57,6 @@ class App:
   try:saved=json.loads((ROOT/"settings.json").read_text())
   except Exception:saved={}
   self.ip=tk.StringVar(value=saved.get("ip",""));self.code=tk.StringVar();self.status=tk.StringVar(value="Sin conexión")
-  self.label(self.root,"KALLEY REMOTE PC",22,CYAN).pack(pady=(20,0))
-  self.label(self.root,"GOOGLE TV  /  DARK EDITION",10,PINK).pack(pady=(0,14))
   self.btn(self.root,"Configurar TV",self.show_settings).pack(pady=(0,12))
   self.label(self.root,"ESTADO",10,PINK).pack(pady=(12,0))
   tk.Label(self.root,textvariable=self.status,bg=BG,fg=CYAN,wraplength=390).pack(pady=(0,12))
