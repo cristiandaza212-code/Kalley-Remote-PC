@@ -14,7 +14,7 @@ if sys.platform == "win32":
 ROOT=Path(os.getenv("LOCALAPPDATA",str(Path.home())))/"KalleyRemotePC"
 ROOT.mkdir(parents=True,exist_ok=True)
 BG="#0b0c0b"; PANEL="#252825"; CYAN="#aeb5ae"; PINK="#245c38"
-KEYS={"Arriba":"KEYCODE_DPAD_UP","Abajo":"KEYCODE_DPAD_DOWN","Izquierda":"KEYCODE_DPAD_LEFT","Derecha":"KEYCODE_DPAD_RIGHT","OK":"KEYCODE_DPAD_CENTER","Inicio":"KEYCODE_HOME","Atrás":"KEYCODE_BACK","Vol +":"KEYCODE_VOLUME_UP","Vol -":"KEYCODE_VOLUME_DOWN","Silencio":"KEYCODE_VOLUME_MUTE","Encender":"KEYCODE_POWER","Play/Pausa":"KEYCODE_MEDIA_PLAY_PAUSE","Entradas":"KEYCODE_TV_INPUT"}
+KEYS={"Arriba":"KEYCODE_DPAD_UP","Abajo":"KEYCODE_DPAD_DOWN","Izquierda":"KEYCODE_DPAD_LEFT","Derecha":"KEYCODE_DPAD_RIGHT","OK":"KEYCODE_DPAD_CENTER","Inicio":"KEYCODE_HOME","Atrás":"KEYCODE_BACK","Vol +":"KEYCODE_VOLUME_UP","Vol -":"KEYCODE_VOLUME_DOWN","Silencio":"KEYCODE_VOLUME_MUTE","Encender":"KEYCODE_POWER","Play/Pausa":"KEYCODE_MEDIA_PLAY_PAUSE","Entradas":"KEYCODE_TV_INPUT","Ajustes":"KEYCODE_SETTINGS"}
 class Remote:
  def __init__(self,notify):
   self.notify=notify;self.loop=asyncio.new_event_loop();self.tv=None;self.host=None;self.ready=False
@@ -63,13 +63,13 @@ class App:
   self.label(self.root,"ESTADO",10,PINK).pack(pady=(12,0))
   tk.Label(self.root,textvariable=self.status,bg=BG,fg=CYAN,wraplength=390).pack(pady=(0,12))
   grid=tk.Frame(self.root,bg=BG);grid.pack()
-  rows=[["Encender","Inicio","Atrás"],["","Arriba",""],["Izquierda","OK","Derecha"],["","Abajo",""],["Vol -","Silencio","Vol +"],["","Play/Pausa",""],["","Entradas",""]]
+  rows=[["Encender","Inicio","Atrás"],["","Arriba",""],["Izquierda","OK","Derecha"],["","Abajo",""],["Vol -","Silencio","Vol +"],["","Play/Pausa",""],["","Entradas","Ajustes"]]
   for i,row in enumerate(rows):
    for j,name in enumerate(row):
     if name:self.btn(grid,name,lambda n=name:self.remote.run(self.remote.key(n))).grid(row=i,column=j,padx=4,pady=4)
   self.btn(self.root,"Teclado TV",self.show_keyboard).pack(pady=(12,3))
   self.text_to_send=tk.StringVar()
-  self.label(self.root,"Flechas / Enter / Esc / Home / + y -",9).pack(pady=12)
+  self.label(self.root,"Flechas / Enter / Backspace / Home / + y -",9).pack(pady=12)
   self.root.bind("<KeyPress>",self.keyboard);self.root.after(100,self.poll)
   if self.ip.get().strip():
    self.status.set("Conectando automáticamente...")
@@ -115,7 +115,7 @@ class App:
  def label(self,parent,value,size=11,color="#f0f8ff"):
   return tk.Label(parent,text=value,bg=parent["bg"],fg=color,font=("Segoe UI",size,"bold"))
  def btn(self,parent,name,command):
-  icons={"Encender":"⏻","Inicio":"⌂","Atrás":"↩","Arriba":"▲","Abajo":"▼","Izquierda":"◀","Derecha":"▶","OK":"●","Vol +":"🔊 +","Vol -":"🔉 −","Silencio":"🔇","Play/Pausa":"⏯","Entradas":"▣","Configurar TV":"⚙","Teclado TV":"⌨"}
+  icons={"Encender":"⏻","Inicio":"⌂","Atrás":"↩","Arriba":"▲","Abajo":"▼","Izquierda":"◀","Derecha":"▶","OK":"●","Vol +":"🔊 +","Vol -":"🔉 −","Silencio":"🔇","Play/Pausa":"⏯","Entradas":"▣","Ajustes":"⚙","Configurar TV":"⛓","Teclado TV":"⌨"}
   shown=icons.get(name,name)
   width=64 if name in KEYS else 126;height=38;radius=12
   canvas=tk.Canvas(parent,width=width,height=height,bg=parent["bg"],highlightthickness=0,bd=0,cursor="hand2")
@@ -161,7 +161,7 @@ class App:
   if hasattr(self,"text_entry") and self.text_entry.winfo_exists():self.text_entry.focus_set()
  def keyboard(self,event):
   if isinstance(event.widget,tk.Entry):return
-  mapping={"Up":"Arriba","Down":"Abajo","Left":"Izquierda","Right":"Derecha","Return":"OK","Escape":"Atrás","Home":"Inicio","F10":"Vol -","F11":"Vol +","plus":"Vol +","KP_Add":"Vol +","minus":"Vol -","KP_Subtract":"Vol -"}
+  mapping={"Up":"Arriba","Down":"Abajo","Left":"Izquierda","Right":"Derecha","Return":"OK","BackSpace":"Atrás","Home":"Inicio","F10":"Vol -","F11":"Vol +","plus":"Vol +","KP_Add":"Vol +","minus":"Vol -","KP_Subtract":"Vol -"}
   if event.keysym in mapping:self.remote.run(self.remote.key(mapping[event.keysym]))
   elif event.char=="+":self.remote.run(self.remote.key("Vol +"))
   elif event.keysym=="BackSpace":self.remote.run(self.remote.type_text("\\b"))
